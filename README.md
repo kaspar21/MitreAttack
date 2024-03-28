@@ -24,3 +24,6 @@ Once the setup is complete, you can use the `MitreAttack` script to analyze MITR
 - `json`: Generate a JSON file with analysis results.
 - `ws`: Analyze results without subtechniques.
 - `all`: Generate all available outputs.
+
+## After using the tool
+Once the program finishes, you can find the files in the output/ directory. The JSON file is also accessible and readable from this link: [https://mitre-attack.github.io/attack-navigator/](url)
