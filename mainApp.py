@@ -141,7 +141,7 @@ def main():
 
     with open(txtfile, 'a') as f:
         f.write("\n---TOP 10 MITIGATIONS---\n")
-        f.write("\nID    :   Name          xCount   :Description\n")
+        f.write("ID    :   Name          xCount   :Description\n")
         with tqdm(total=10,desc="Mitigations...") as pbar:
             for mitigation, count in top_10_mitigations:
                 description = get_mitigation_description(mitigation)
@@ -160,7 +160,7 @@ def main():
     
     with open(txtfile, 'a') as f:
         f.write("\n---TOP 10 DETECTIONS---\n")
-        f.write("\nID    :   Name          xCount   :Description\n")
+        f.write("ID    :   Name          xCount   :Description\n")
         with tqdm(total=10,desc="Detections...") as pbar:
             for detection, count in top_10_detections:
                 description = get_detection_description(detection)
