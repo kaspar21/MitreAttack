@@ -6,10 +6,11 @@ import os
 import re
 from collections import Counter
 from generate_heatmap import generate_attck_heatmap_json , generate_attck_heatmap_csv
-from functions import WhoUseThatTechnique, get_id_by_group, sort_list, get_detection_description, get_mitigation_for_technique, get_mitigation_description, get_detection_for_technique
+from functions import WhoUseThatTechnique, get_id_by_group, sort_list, get_mitigation_name, get_detection_description, get_mitigation_for_technique, get_mitigation_description, get_detection_name, get_detection_for_technique
 from mitreattack.stix20 import MitreAttackData
+from tqdm import tqdm
 
-filename = time.strftime("%H_%M-%d%m%y")
+filename = time.strftime("%H_%M_%S-%d%m%y")
 dirdate = time.strftime("%d%m%y")
 dirname = f"output/output_{dirdate}"
 
@@ -44,6 +45,7 @@ def main():
     sorted_group = sort_list(groups_disorder, mad) # List of groups cleanliness with G**
     technique_count = collections.Counter(techniques) #How many techniques
     group_count = collections.Counter(sorted_group) #How many groups
+    everytechniques = techniques
 
     #Start writing in the txtfile
     txtfile = dirname+"/"+ filename + ".txt"
@@ -51,9 +53,10 @@ def main():
         f.write("---GROUPS---\n")
         for groups, count in sorted(group_count.items(),key=lambda x: x[1], reverse=True):
             f.write(f"{groups} - {count}\n")
-        f.write("\n---TECHNIQUES---\n")
-        for technique, count in sorted(technique_count.items(),key=lambda x: x[1], reverse=True):
-            f.write(f"{technique} - {count}\n")
+        if technique_count : 
+            f.write("\n---TECHNIQUES---\n")
+            for technique, count in sorted(technique_count.items(),key=lambda x: x[1], reverse=True):
+                f.write(f"{technique} - {count}\n")
     
 #=========================================================================#
 
@@ -64,7 +67,7 @@ def main():
         id_group = get_id_by_group(group, mad)
         techniques_used_by = WhoUseThatTechnique(id_group, mad)
         all_techniques.extend(techniques_used_by)
-    
+    everytechniques.extend(all_techniques) #User-given techniques + user-given techniques used by groups
     technique_without_subtechniques = [technique.split('.')[0] for technique in all_techniques]
     
     technique_counts = Counter(all_techniques)# dict of techniques used by groups and how often they are used ({'T1204.001': 2, 'T1078': 2})
@@ -119,11 +122,18 @@ def main():
 
         jsonfilename = dirname+"/"+ filename + "withoutsubtechniques.json"
         generate_attck_heatmap_json(heatmap_data_without, jsonfilename,scoremax_without) # Generate heatmap of technique used by groups in input
-    
+    csvfilenamews  = dirname + "/" + filename + "ws.csv"
+    if ('all' in arguments) :
+        csvfilenamews  = dirname + "/" + filename + "ws.csv"
+        generate_attck_heatmap_csv(heatmap_data,csvfilenamews)
+
+    if ('ws' in arguments and 'csv' in arguments ):
+        csvfilenamews  = dirname + "/" + filename + "ws.csv"
+        generate_attck_heatmap_csv(heatmap_data,csvfilenamews)
 #====================================================================#
 #======================== MITIGATION ==================================#
     list_mitigation = []
-    for tech in techniques :
+    for tech in everytechniques :
         mitigation_for_tech = get_mitigation_for_technique(tech,mad)
         list_mitigation.extend(mitigation_for_tech)
     
@@ -131,9 +141,14 @@ def main():
 
     with open(txtfile, 'a') as f:
         f.write("\n---TOP 10 MITIGATIONS---\n")
-        for mitigation, count in top_10_mitigations:
-            description = get_mitigation_description(mitigation)
-            f.write(f"{mitigation} x{count} : {description} \n")
+        f.write("\nID    :   Name          xCount   :Description\n")
+        with tqdm(total=10,desc="Mitigations...") as pbar:
+            for mitigation, count in top_10_mitigations:
+                description = get_mitigation_description(mitigation)
+                name = get_mitigation_name(mitigation)
+                f.write(f"{mitigation} : {name} x{count} : {description} \n")
+                pbar.update(1)
+
 
 #======================== DETECTIONS ==================================#
     list_detections = [] 
@@ -145,15 +160,20 @@ def main():
     
     with open(txtfile, 'a') as f:
         f.write("\n---TOP 10 DETECTIONS---\n")
-        for detection, count in top_10_detections:
-            description = get_detection_description(detection)
-            f.write(f"{detection} x{count} : {description} \n")
+        f.write("\nID    :   Name          xCount   :Description\n")
+        with tqdm(total=10,desc="Detections...") as pbar:
+            for detection, count in top_10_detections:
+                description = get_detection_description(detection)
+                name = get_detection_name(detection)
+                f.write(f"{detection} : {name} x{count} : {description} \n")
+                pbar.update(1)
 
 
 #============ Print txt file results in the console =====================#
     print("That's it, it's finished!")
     with open(txtfile, 'r') as f:
         content = f.read()
+        print("\n\n")
         print(content)
     print("\n\nPlease find your files in the output folder !")
 

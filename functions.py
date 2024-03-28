@@ -123,6 +123,38 @@ def get_detection_description(detection):
         return ""
 
 
+#============ Get Name =====================#
+
+def get_technique_Name(technique):
+    mitre_attack_data = MitreAttackData("enterprise-attack.json")
+    id = get_id_by_technique(technique,mitre_attack_data)
+    technique = mitre_attack_data.get_object_by_stix_id(id)
+    if technique and technique.name != None:
+        name = technique.name
+        return name
+    else : 
+        return ""
+    
+def get_mitigation_name(mitigation):
+    mitre_attack_data = MitreAttackData("enterprise-attack.json")
+    id = get_id_by_mitigation(mitigation,mitre_attack_data)
+    mitigation = mitre_attack_data.get_object_by_stix_id(id)
+    if mitigation and mitigation.name != None:
+        name = mitigation.name
+        return name
+    else : 
+        return ""
+
+def get_detection_name(detection):
+    mitre_attack_data = MitreAttackData("enterprise-attack.json")
+    id = get_id_by_detection(detection,mitre_attack_data)
+    detection = mitre_attack_data.get_object_by_stix_id(id)
+    if detection and detection.name != None:
+        name = detection.name
+        return name
+    else : 
+        return ""
+
 #============ Others =====================#
 
 
@@ -153,41 +185,20 @@ def NameToGroup(name, mitre_attack_data): #Aquatic Panda ==> G0117
 
 
 
-def get_technique_Name(technique):
-    mitre_attack_data = MitreAttackData("enterprise-attack.json")
-    id = get_id_by_technique(technique,mitre_attack_data)
-    technique = mitre_attack_data.get_object_by_stix_id(id)
-    if technique:
-        name = technique.name
-        return name
-    else : 
-        return ""
-    
-def get_mitigation_name(mitigation):
-    mitre_attack_data = MitreAttackData("enterprise-attack.json")
-    id = get_id_by_mitigation(mitigation,mitre_attack_data)
-    mitigation = mitre_attack_data.get_object_by_stix_id(id)
-    if mitigation:
-        description = mitigation.name
-        descri = description.replace('\n',' ')
-        return descri
-    else : 
-        return ""
-
 
 
 
 
 
 if __name__ == "__main__":
-    techniques = ['M1018', 'M1022', 'M1052', 'M1018']
+    #techniques = ['M1018', 'M1022', 'M1052', 'M1018']
     #detec  = ['DS0009','DS0022','DS0029','DS0017','DS0002']
     mitre_attack_data = MitreAttackData("enterprise-attack.json")
     i=0
-    for tech in techniques : 
-        name = get_mitigation_name(tech)
-        print(f"mitig{i} = {name}")
-        i+=1
+    u='Aquatic Panda'
+    zz = NameToGroup(u,mitre_attack_data)
+    print(f"{u} is {zz}")
+    
 
     """
     mitre_attack_data = MitreAttackData("enterprise-attack.json")
