@@ -1,10 +1,5 @@
 # MitreAttack
 
-
-Launch the code with ./MitreAttack
-For help, ./MitreAttack help
-
-
 MitreAttack is a tool designed to analyze and process data from the MITRE ATT&CK framework. The tool allows users to perform various analyses on techniques and groups, generate heatmaps, and extract mitigation and detection information.
 
 ## Requirements
